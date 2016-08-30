@@ -27,6 +27,7 @@
 % Record format: Key, Value, I(n), EF, Date 
 % 
 %calculateInterval(N, EF, Interval) -> N is the previous interval, is the number of days for the previous interval.
+:-dynamic(entry/5).
 calculateInterval(0, EF, Interval) :-
 	Interval is 1, !.
 calculateInterval(1, EF, Interval) :-
@@ -34,8 +35,8 @@ calculateInterval(1, EF, Interval) :-
 calculateInterval(N, EF, Interval) :-
 	Interval is N*EF, !.
 
-%updateEF(EF1, EF2, Q) -> EF1 is the current EF, EF2 is the new EF, Q is the rating supplied by the user, the new EF cannot be below 1.3 or above 2.5.
-updateEF(EF1, EF2, Q) :- 
+%updateEF(EF1,Q, EF2) -> EF1 is the current EF, EF2 is the new EF, Q is the rating supplied by the user, the new EF cannot be below 1.3 or above 2.5.
+updateEF(EF1, Q, EF2) :- 
 	EF is EF1-0.8+0.28*Q-0.02*Q*Q, boundCheck(EF, EF2).
 
 %Boundcheck(EF, EF2) -> EF2 is EF modified to be in the range 1.3 to 2.5.
@@ -53,8 +54,16 @@ entry("Foo", "Bar", 0, 2.5, 1472587304.0).
 %Get current date, get all records that are due, prompt key, take value. Determine if the value is incorrect and 
 dailyMemorization :-
        get_time(CurrentTime),
-       findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z).
+       findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z),test(Z).
 
+test([H|T]) :- entry(H, Value, N, EF, Date), write(H), nl, write(Value), nl, write(N),nl, write(EF), nl,read(Q), process(H,Q,T,T2), test(T2).
+test([]) :- write("All done!").
+
+process(H,Q,[],[H]) :- Q<3,updateRecord(H), !.
+process(H,Q,T,T2) :- Q<3, updateRecord(H),append(T,H,T2),!.
+process(H,Q,T,T) :- Q>=3,!.
+
+updateRecord(H) :- entry(H,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), retract(entry(H,Value,N,EF,Date)), assertz(entry(H,Value,NewINterval,NewEF,Date)).
 
 
 	
