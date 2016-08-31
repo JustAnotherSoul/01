@@ -59,11 +59,12 @@ dailyMemorization :-
 test([H|T]) :- entry(H, Value, N, EF, Date), write(H), nl, write(Value), nl, write(N),nl, write(EF), nl,read(Q), process(H,Q,T,T2), test(T2).
 test([]) :- write("All done!").
 
-process(H,Q,[],[H]) :- Q<3,updateRecord(H), !.
-process(H,Q,T,T2) :- Q<3, updateRecord(H),append(T,H,T2),!.
-process(H,Q,T,T) :- Q>=3,!.
+process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H), !.
+process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,H,T2),!.
+process(H,Q,T,T) :- Q>=3, updateRecord(H), !.
 
-updateRecord(H) :- entry(H,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), retract(entry(H,Value,N,EF,Date)), assertz(entry(H,Value,NewINterval,NewEF,Date)).
-
+updateRecord(H) :- entry(H,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), updatePractice(Date, NewInterval, NewDate), retract(entry(H,Value,N,EF,Date)), assertz(entry(H,Value,NewINterval,NewEF,NewDate)).
+%This works below because we retry until success.
+updateRecordFailure(H) :- entry(H, Value, N, EF, Date), newInterval is 0, retract(entry(H,Value,N,EF,Date)), assertz(entry(H,Value,NewInterval,EF, Date)).
 
 	
