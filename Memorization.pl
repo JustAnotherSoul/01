@@ -1,7 +1,5 @@
-:-dynamic(entry/5).
-entry(1, "Bar1", 0, 2.5, 1472587304.0).
-entry(2, "Bar2", 0, 2.5, 1472587304.0).
-entry(3, "Bar3", 0, 2.5, 1472587304.0).
+:- dynamic(entry/5).
+:- ensure_loaded(data).
 %calculateInterval(N, EF, Interval) -> N is the previous interval, is the number of days for the previous interval.
 calculateInterval(0, EF, Interval) :-
 	Interval is 1, !.
