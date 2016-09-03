@@ -6,8 +6,13 @@ dailyMemorization :-
        get_time(CurrentTime),
        findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z),test(Z).
 
-prompt(Q,Value) :- data(Value, Hint, Answer), read(Q).
+prompt(Q,Value) :- data(Value, Hint, Answer), write(Value), nl, write("Enter the answer, or H for hint"), nl, read_string(user_input, "\n", "\r", End, String), userResponse(Q, String, Value).
 prompt(Q,Value) :- write("A data error occurred could not find an entry labeled: "), write(Value), nl, Q is 4.
+
+userResponse(Q, "H", Value) :- data(Value, Hint, Answer), write(Hint), nl, prompt(Q,Value).
+userResponse(Q, Str, Value) :- data(Value, Hint, Answer), write("Your response: "), write(Str), nl, write("The answer is: "), write(Answer), nl, getScoring(Q).
+
+getScoring(Q) :- write("Score yourself 0-5, 0 being couldn't remember at all, 3 remembered but with great difficulty, and 5 being remembered perfectly"), nl, read_string(user_input, "\n", "\r", End, Str), number_codes(Q, Str).
 
 test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2).
 test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3).
@@ -23,7 +28,7 @@ validate(H,Q,[],[H]) :- Q<4.
 validate(H,Q,T,T2) :- Q<4,append(T,[H],T2).
 validate(H,Q,T,T) :- Q>=4.
 
-retry([H|T]) :- entry(H,Value,N,EF,Date), write(H),nl, prompt(Q,Value), validate(H,Q,T,T2), retry(T2).
+retry([H|T]) :- entry(H,Value,N,EF,Date), prompt(Q,Value), validate(H,Q,T,T2), retry(T2).
 retry([]) :- write("That's all for now!").
 
 updateRecord(Key,Q) :- entry(Key,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), updatePractice(Date, NewInterval, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,NewInterval,NewEF,NewDate)).
