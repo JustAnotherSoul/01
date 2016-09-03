@@ -7,7 +7,7 @@ dailyMemorization :-
        findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z),test(Z).
 
 prompt(Q,Value) :- data(Value, Hint, Answer), write(Value), nl, write("Enter the answer, or H for hint"), nl, read_string(user_input, "\n", "\r", End, String), userResponse(Q, String, Value).
-prompt(Q,Value) :- write("A data error occurred could not find an entry labeled: "), write(Value), nl, Q is 4.
+prompt(Q,Value) :- \+data(Value, _, _), write("A data error occurred could not find an entry labeled: "), write(Value), nl, Q is 4.
 
 userResponse(Q, "H", Value) :- data(Value, Hint, Answer), write(Hint), nl, prompt(Q,Value).
 userResponse(Q, Str, Value) :- data(Value, Hint, Answer), write("Your response: "), write(Str), nl, write("The answer is: "), write(Answer), nl, getScoring(Q).
