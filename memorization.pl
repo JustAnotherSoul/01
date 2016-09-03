@@ -42,9 +42,9 @@ updateEF(EF1, Q, EF2) :-
 	EF is EF1-0.8+0.28*Q-0.02*Q*Q, boundCheck(EF, EF2).
 
 %Boundcheck(EF, EF2) -> EF2 is EF modified to be in the range 1.3 to 2.5.
-boundCheck(EF, EF2) :- EF>2.5, EF2 is 2.5, !.
-boundCheck(EF, EF2) :- EF<1.3, EF2 is 1.3, !.
-boundCheck(EF, EF2) :- EF2 is EF, !.
+boundCheck(EF, EF2) :- EF>2.5, EF2 is 2.5.
+boundCheck(EF, EF2) :- EF<1.3, EF2 is 1.3.
+boundCheck(EF, EF2) :- EF2 is EF.
 
 %updatePractice(CurrentDate, Interval, NewDate) -> Take the CurrentDate add the Interval for NewDate in seconds 
 updatePractice(CurrentDate, Interval, NewDate) :- TempDate is CurrentDate+Interval*86400, stamp_date_time(TempDate, date(Y,M,D,_,_,_,_,_,_), local), date_time_stamp(date(Y,M,D,0,0,0,_,_,_), NewDate).
