@@ -6,7 +6,8 @@ dailyMemorization :-
        get_time(CurrentTime),
        findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z),test(Z).
 
-prompt(Q,_) :- read(Q).
+prompt(Q,Value) :- data(Value, Hint, Answer), read(Q).
+prompt(Q,Value) :- write("A data error occurred could not find an entry labeled: "), write(Value), nl, Q is 4.
 
 test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2).
 test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3).
@@ -18,9 +19,9 @@ process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2),!.
 process(H,Q,T,T2) :- Q==3, updateRecord(H,Q), append(T,[H],T2),!.
 process(H,Q,T,T) :- Q>=4, updateRecord(H,Q),!.
 
-validate(H,Q,[],[H]) :- Q<3,!.
-validate(H,Q,T,T2) :- Q<4,append(T,[H],T2),!.
-validate(H,Q,T,T) :- Q>=4,!.
+validate(H,Q,[],[H]) :- Q<4.
+validate(H,Q,T,T2) :- Q<4,append(T,[H],T2).
+validate(H,Q,T,T) :- Q>=4.
 
 retry([H|T]) :- entry(H,Value,N,EF,Date), write(H),nl, prompt(Q,Value), validate(H,Q,T,T2), retry(T2).
 retry([]) :- write("That's all for now!").
