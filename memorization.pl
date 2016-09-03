@@ -12,12 +12,15 @@ prompt(Q,Value) :- write("A data error occurred could not find an entry labeled:
 userResponse(Q, "H", Value) :- data(Value, Hint, Answer), write(Hint), nl, prompt(Q,Value).
 userResponse(Q, Str, Value) :- data(Value, Hint, Answer), write("Your response: "), write(Str), nl, write("The answer is: "), write(Answer), nl, getScoring(Q).
 
-getScoring(Q) :- write("Score yourself 0-5, 0 being couldn't remember at all, 3 remembered but with great difficulty, and 5 being remembered perfectly"), nl, read_string(user_input, "\n", "\r", End, Str), number_codes(Q, Str).
+getScoring(Q) :- write("Score yourself 0-5, 0 being couldn't remember at all, 3 remembered but with great difficulty, and 5 being remembered perfectly"), nl, read_string(user_input, "\n", "\r", End, Str), atom_string(Temp, Str), checkIfNum(Temp, Q).
 
-test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2).
-test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3).
-test([], Retry) :- retry(Retry).
-test([]) :- write("You've already done all necessary practice for today").
+checkIfNum(Temp, Q) :- atom_number(Temp, Q).
+checkIfNum(Temp, Q) :- \+ atom_number(Temp, Q), write("Sorry, invalid input: "), nl, getScoring(Q).
+
+test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2), !.
+test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3), !.
+test([], Retry) :- retry(Retry), !.
+test([]) :- write("You've already done all necessary practice for today"), !.
 
 process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H).
 process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2).
