@@ -1,3 +1,3 @@
-entry(1, "Bar1", 0, 2.5, 1472587304.0).
-entry(2, "Bar2", 0, 2.5, 1472587304.0).
-entry(3, "Bar3", 0, 2.5, 1472587304.0).
+data("Bar1", "F..B..", "Foo1Bar1").
+data("Bar2", "F..B..", "Foo2Bar2").
+data("Bar3", "F..B..", "Foo3Bar3").
