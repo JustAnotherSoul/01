@@ -31,8 +31,8 @@ validate(H,Q,T,T) :- Q>=4.
 retry([H|T]) :- entry(H,Value,N,EF,Date), prompt(Q,Value), validate(H,Q,T,T2), retry(T2).
 retry([]) :- write("That's all for now!").
 
-updateRecord(Key,Q) :- entry(Key,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), updatePractice(Date, NewInterval, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,NewInterval,NewEF,NewDate)).
-updateRecordFailure(Key) :- entry(Key, Value, N, EF, Date), updatePractice(Date, 1, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,1,EF, NewDate)).
+updateRecord(Key,Q) :- entry(Key,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), get_time(CurrentDate), updatePractice(CurrentDate, NewInterval, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,NewInterval,NewEF,NewDate)).
+updateRecordFailure(Key) :- entry(Key, Value, N, EF, Date), get_time(CurrentDate), updatePractice(CurrentDate, 1, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,1,EF, NewDate)).
 
 %calculateInterval(N, EF, Interval) -> N is the previous interval, is the number of days for the previous interval.
 calculateInterval(0, EF, Interval) :-
