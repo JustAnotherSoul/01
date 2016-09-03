@@ -12,12 +12,12 @@ prompt(Q,Value) :- write("A data error occurred could not find an entry labeled:
 test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2).
 test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3).
 test([], Retry) :- retry(Retry).
-test([]).
+test([]) :- write("You've already done all necessary practice for today").
 
-process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H),!.
-process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2),!.
-process(H,Q,T,T2) :- Q==3, updateRecord(H,Q), append(T,[H],T2),!.
-process(H,Q,T,T) :- Q>=4, updateRecord(H,Q),!.
+process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H).
+process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2).
+process(H,Q,T,T2) :- Q==3, updateRecord(H,Q), append(T,[H],T2).
+process(H,Q,T,T) :- Q>=4, updateRecord(H,Q).
 
 validate(H,Q,[],[H]) :- Q<4.
 validate(H,Q,T,T2) :- Q<4,append(T,[H],T2).
@@ -31,11 +31,11 @@ updateRecordFailure(Key) :- entry(Key, Value, N, EF, Date), updatePractice(Date,
 
 %calculateInterval(N, EF, Interval) -> N is the previous interval, is the number of days for the previous interval.
 calculateInterval(0, EF, Interval) :-
-	Interval is 1, !.
+	Interval is 1.
 calculateInterval(1, EF, Interval) :-
-	Interval is 6, !.
+	Interval is 6.
 calculateInterval(N, EF, Interval) :-
-	Interval is N*EF, !.
+	Interval is N*EF.
 
 %updateEF(EF1,Q, EF2) -> EF1 is the current EF, EF2 is the new EF, Q is the rating supplied by the user, the new EF cannot be below 1.3 or above 2.5.
 updateEF(EF1, Q, EF2) :- 
