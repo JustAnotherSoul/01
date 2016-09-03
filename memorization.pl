@@ -1,4 +1,3 @@
-:- dynamic(entry/5).
 :- ensure_loaded(data).
 :- ensure_loaded(entries).
 %Get current date, get all records that are due, prompt key, take value. Determine if the value is incorrect and update 
