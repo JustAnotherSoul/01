@@ -1,13 +1,8 @@
 :- ensure_loaded(data).
 :- ensure_loaded(entries).
-%Get current date, get all records that are due, prompt key, take value. Determine if the value is incorrect and update 
-dailyMemorization :-
-       get_time(CurrentTime),
-       findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z),test(Z), store('entries.pl').
 	   
 store(Filename) :- 
 	tell(Filename), listing(entry/5), told.
-
 
 prompt(Q,Value) :- data(Value, Hint, Answer), write(Value), nl, write("Enter the answer, or H for hint"), nl, read_string(user_input, "\n", "\r", End, String), userResponse(Q, String, Value).
 prompt(Q,Value) :- \+data(Value, _, _), write("A data error occurred could not find an entry labeled: "), write(Value), nl, Q is 4.
@@ -21,9 +16,9 @@ checkIfNum(Temp, Q) :- atom_number(Temp, Q).
 checkIfNum(Temp, Q) :- \+ atom_number(Temp, Q), write("Sorry, invalid input: "), nl, getScoring(Q).
 
 test([H|T]) :- entry(H, Value, N, EF, Date),prompt(Q,Value), process(H,Q,[],T2), test(T,T2), !.
+test([]) :- write("You've already done all necessary practice for today"), !.
 test([H|T], Retry) :- entry(H,Value,N,EF,Date),prompt(Q,Value), process(H,Q,Retry,T3), test(T, T3), !.
 test([], Retry) :- retry(Retry), !.
-test([]) :- write("You've already done all necessary practice for today"), !.
 
 process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H).
 process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2).
