@@ -12,14 +12,14 @@ server(Port) :-
 
 begin_memorization(_Request) :- 
 	get_time(CurrentTime),
-	findall(Key, (entry(Key,Value,N,EF,Date), CurrentTime > Date), Z), goFor(Z).
+	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), Z), goFor(Z), store('entries2.pl').
 
 goFor(Z) :-
 	reply_html_page(
 		title('Huzzah!'),
-		[\construct_user_interface(Request, Z)]).
+		[\construct_user_interface(_Request, Z)]).
 
-construct_user_interface(Request, Z) -->
+construct_user_interface(_Request, Z) -->
 	html(
 		[
 		h1('Got the following list:')
@@ -62,4 +62,5 @@ table_column(X) -->
 		\[X]
 	]),
 	html_end(td).
+
 
