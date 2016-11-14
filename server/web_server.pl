@@ -3,8 +3,8 @@
 :- use_module(library(http/http_error)).
 :- use_module(library(http/html_write)).
 :- use_module(library(http/http_parameters)).
-:- ensure_loaded(memorization).
-:- ensure_loaded(entries).
+:- ensure_loaded(../algorithm/memorization).
+:- ensure_loaded(../data/entries).
 server(Port) :-
 	http_server(http_dispatch, [port(Port)]).
 
@@ -18,18 +18,17 @@ welcome(Request) :-
 		
 begin_memorization(_Request) :- 
 	get_time(CurrentTime),
-	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), Z), goFor(Z), store('entries2.pl').
+	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), Z), create_ui(Z), store('entries2.pl').
 
 respond(_Request) :-
 	reply_html_page(
 		title('Rate your response'),
 		p('Under construction!')).
 
-goFor(Z) :-
+create_ui(Z) :-
 	reply_html_page(
 		title('Huzzah!'),
 		[\prompt_form(_Request, Z)]).
-		%		[\construct_user_interface(_Request, Z)]).
 
 welcome_page(_Request) -->
 		html_begin(p),
@@ -95,3 +94,6 @@ prompt_form(_Request, [H|T]) -->
 	html_begin(input(type(text), name(answer))),
 	html_begin(input(type(submit), value('Submit'))).
 	
+response_form(_Request, [H|T]) -->
+	html_begin(form(action())),
+	['Actual: ',
