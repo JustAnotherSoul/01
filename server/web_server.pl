@@ -3,8 +3,9 @@
 :- use_module(library(http/http_error)).
 :- use_module(library(http/html_write)).
 :- use_module(library(http/http_parameters)).
-:- ensure_loaded(../algorithm/memorization).
-:- ensure_loaded(../data/entries).
+:- ensure_loaded("../algorithm/memorization").
+:- ensure_loaded("../data/entries").
+:- ensure_loaded("../data/data").
 server(Port) :-
 	http_server(http_dispatch, [port(Port)]).
 
@@ -12,19 +13,30 @@ server(Port) :-
 :- http_handler('/memorize.html', begin_memorization, []).
 :- http_handler('/response.html', respond, []). 
 
+%Set the title to 'Welcome' and call the predicate "welcome_page" with the request, the welcome page redirects to the memorization page.
 welcome(Request) :-
 	reply_html_page(
 		title('Welcome!'),[\welcome_page(Request)]).
-		
-begin_memorization(_Request) :- 
+	
+%Puts the keys of entries due for today into 'KeySet'
+get_practice_set(KeySet) :-
 	get_time(CurrentTime),
-	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), Z), create_ui(Z), store('entries2.pl').
+	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), 		KeySet).
 
-respond(_Request) :-
+%Landing point for 'memorize.html'. Gets the current time, finds all entries that are due and prompts for them. Stores the result in 'entries2.pl' User logins: instead of 'entries2' 'entries_UID/USER_NAME/etc' 
+begin_memorization(_Request) :-
+        get_practice_set(Z),	
+	create_ui(Z), store('entries2.pl').
+
+%Landing point for 'response.html'
+respond(Request) :-
+	http_parameters(Request, [key(_Key,[]),answer(Answer,[]),practice_remaining(Practice,[])]), 
+	get_list(Practice, KeyList),
 	reply_html_page(
 		title('Rate your response'),
-		p('Under construction!')).
+		paragraph(Practice)).
 
+%Prepare and prompt the form for the specified verses (this will be done several times)
 create_ui(Z) :-
 	reply_html_page(
 		title('Huzzah!'),
@@ -51,6 +63,7 @@ construct_user_interface(_Request, Z) -->
 	html([\table_data(Z)]),
 	html_end(table).
 
+%DCG for table header with 'x' in the header
 table_header(X) -->
 	html_begin(th),
 	html([
@@ -58,6 +71,7 @@ table_header(X) -->
 	]),
 	html_end(th).
 
+%DCG for a table containing all entries referenced by the passed in list
 table_data([H|T]) -->
 	{ 
 		entry(H, Value, N, EF, Date),
@@ -77,23 +91,57 @@ table_data([H|T]) -->
 table_data([]) --> 
 	[].
 
+paragraph(X) -->
+	html_begin(p),
+	html([
+		\[X]
+	]),
+	html_end(p).
+
 table_column(X) -->
 	html_begin(td),
 	html([
 		\[X]
 	]),
 	html_end(td).
-
+%This will be called once for each entry to be done eventually:
+%This is passing in a hidden input the key of the item being tested (to get it out on the other side), as well as (soon) the rest of the list.
 prompt_form(_Request, [H|T]) -->
 	{
-		entry(H, Value, N, EF, Date),
-		data(Value, Hint, Answer)
+		entry(H, Value, _N, _EF, _Date),
+		data(Value, Hint, _Answer)
+	},
+	{
+		get_string(T, TailString)
 	},
 	html_begin(form(action('response.html'))),
 	['Hint: ',Hint, '<br/>','Your Answer: '],
 	html_begin(input(type(text), name(answer))),
+	html_begin(input(type(hidden), name(key), value(H))),
+	html_begin(input(type(hidden), name(practice_remaining), value(TailString))),
 	html_begin(input(type(submit), value('Submit'))).
-	
-response_form(_Request, [H|T]) -->
+
+%This takes a list and returns it in a string
+get_string([H|T], TailString) :-
+	get_string(T, TailString2),
+	string_concat(",", TailString2, TailString3),
+	string_concat(H, TailString3, TailString).
+get_string([H], H).
+
+%Gets a number list from the string
+get_list(String, List) :-
+	split_string(String, ",", "", AsList),
+	to_number_list(AsList, List).
+
+%Converts a list of strings to a list of numbers
+to_number_list([H|T], NumberList) :-
+	atom_string(Atom, H), 
+	atom_number(Atom, Num),
+	to_number_list(T, NumberList2),
+	append([Num],NumberList2, NumberList).
+to_number_list([], []).
+
+%This response form provides the feed back (1-5 score of how easily it was remembered), and then the memorization algorithm will be called through once this is submitted. (Memorization: process(H,Q,T,NewT))
+response_form(_Request, [H|T], Answer) -->
 	html_begin(form(action())),
-	['Actual: ',
+	['Actual: ', H].

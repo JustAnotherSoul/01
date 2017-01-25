@@ -1,11 +1,10 @@
-:- ensure_loaded(data).
-:- ensure_loaded(entries).
+:- ensure_loaded("../data/entries").
 	   
 %store(Filename) -> store the 'entry', the user data in the data file.
 store(Filename) :- 
 	tell(Filename), listing(entry/5), told.
 
-%Process the record, updating it appropriately.
+%Process the record, updating it appropriately. Puts the element back in the list if it was a failure.
 process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H).
 process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2).
 process(H,Q,T,T2) :- Q==3, updateRecord(H,Q), append(T,[H],T2).
