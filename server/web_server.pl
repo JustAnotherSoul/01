@@ -6,6 +6,7 @@
 :- ensure_loaded("../algorithm/memorization").
 :- ensure_loaded("../data/entries").
 :- ensure_loaded("../data/data").
+:- ensure_loaded("web_utils").
 server(Port) :-
 	http_server(http_dispatch, [port(Port)]).
 
@@ -68,59 +69,6 @@ welcome_page(_Request) -->
 		[' to be taken to the memorization portion of the site'],
 		html_end(p).
 
-construct_user_interface(_Request, Z) -->
-	html(
-		[
-		h1('Got the following list:')
-		]
-	),
-	html_begin(table(border(1), align(center), width('80%'))),
-	html([\table_header('Index'), \table_header('Value'),\table_header('Hint'),\table_header('Answer'), \table_header('Interval'), \table_header('Effort Factor'), \table_header('Date')]),
-
-	html([\table_data(Z)]),
-	html_end(table).
-
-%DCG for table header with 'x' in the header
-table_header(X) -->
-	html_begin(th),
-	html([
-		\[X]
-	]),
-	html_end(th).
-
-%DCG for a table containing all entries referenced by the passed in list
-table_data([H|T]) -->
-	{ 
-		entry(H, Value, N, EF, Date),
-		data(Value, Hint, Answer)
-	},
-	html_begin(tr),
-	table_column(H),
-	table_column(Value),
-	table_column(Hint),
-	table_column(Answer),
-	table_column(N),
-	table_column(EF),
-	table_column(Date),
-	html_end(tr),
-	['Hint ', Hint,'<br/>'],
-	table_data(T).
-table_data([]) --> 
-	[].
-
-paragraph(X) -->
-	html_begin(p),
-	html([
-		\[X]
-	]),
-	html_end(p).
-
-table_column(X) -->
-	html_begin(td),
-	html([
-		\[X]
-	]),
-	html_end(td).
 %This will be called once for each entry to be done eventually:
 %This is passing in a hidden input the key of the item being tested (to get it out on the other side), as well as (soon) the rest of the list.
 prompt_form(_Request, [H|T]) -->
@@ -180,8 +128,13 @@ response_form(_Request, Key, KeyList, Answer) -->
 		data(Value, _Hint, Actual)
 	},
 	html_begin(form(action('update.html'))),
-		['Your response was: ', Answer, '<br>The actual answer was: ', Actual],
-	html_begin(input(type(text), name(rating), autocomplete=off)),
+	['Your response was: ', Answer, '<br>The actual answer was: ', Actual, '<br>'],
+	radio_button(rating, 1),
+	radio_button(rating, 2),
+	checked_radio_button(rating, 3),
+	radio_button(rating, 4),
+	radio_button(rating, 5),
+	%	html_begin(input(type(text), name(rating), autocomplete=off)),
 	html_begin(input(type(hidden), name(key), value(Key))),
 	html_begin(input(type(hidden), name(practice_remaining), value(KeyList))),
 	html_begin(input(type(submit), value('Submit'))).
