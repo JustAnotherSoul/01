@@ -5,15 +5,17 @@ store(Filename) :-
 	tell(Filename), listing(entry/5), told.
 
 %Process the record, updating it appropriately. Puts the element back in the list if it was a failure.
-process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H).
-process(H,Q,T,T2) :- Q<3, updateRecordFailure(H),append(T,[H],T2).
-process(H,Q,T,T2) :- Q==3, updateRecord(H,Q), append(T,[H],T2).
+process(H,Q,[],[H]) :- Q<3,updateRecordFailure(H,Q).
+process(H,Q,T,T2) :- Q<3, updateRecordFailure(H,Q),append(T,[H],T2).
+process(H,Q,T,T2) :- Q==3, updateRecordWeak(H,Q), append(T,[H],T2).
 process(H,Q,T,T) :- Q>=4, updateRecord(H,Q).
 
-%Updates the specified key based on the Q value given (Q >= 3).
+%Updates the specified key based on the Q value given (Q > 3).
 updateRecord(Key,Q) :- entry(Key,Value,N,EF,Date), calculateInterval(N,EF,NewInterval), updateEF(EF,Q,NewEF), get_time(CurrentDate), updatePractice(CurrentDate, NewInterval, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,NewInterval,NewEF,NewDate)).
-%Updates the specified key based on the Q Value given (Q < 3)
-updateRecordFailure(Key) :- entry(Key, Value, N, EF, Date), get_time(CurrentDate), updatePractice(CurrentDate, 1, NewDate), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,1,EF, NewDate)).
+%Updates the specified key based on the Q Value given (Q = 3): Don't update the date because the eventual success will do that.
+updateRecordWeak(Key,Q) :- entry(Key, Value, N, EF, Date), updateEF(EF, Q, NewEF), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value, N, NewEF, Date)).
+%Updates the specified key based on the Q Value given (Q < 3), pull the date back to 0, let the inveitable success update it.
+updateRecordFailure(Key, Q) :- entry(Key, Value, N, EF, Date), updateEF(EF,Q,NewEF), retract(entry(Key,Value,N,EF,Date)), assertz(entry(Key,Value,0, NewEF, Date)).
 
 %calculateInterval(N, EF, Interval) -> N is the previous interval, is the number of days for the previous interval.
 calculateInterval(0, _EF, Interval) :-
@@ -21,7 +23,7 @@ calculateInterval(0, _EF, Interval) :-
 calculateInterval(1, _EF, Interval) :-
 	Interval is 6.
 calculateInterval(N, EF, Interval) :-
-	Interval is N*EF.
+Interval is N*EF.
 
 %updateEF(EF1,Q, EF2) -> EF1 is the current EF, EF2 is the new EF, Q is the rating supplied by the user, the new EF cannot be below 1.3 or above 2.5.
 updateEF(EF1, Q, EF2) :- 

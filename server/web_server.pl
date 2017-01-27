@@ -47,10 +47,6 @@ respond(Request) :-
 		[\response_form(_Request, Key, Practice, Answer)]).
 
 %Prepare and prompt the form for the specified verses (this will be done several times)
-create_ui([-1]) :-
-	reply_html_page(
-		title('All done!'),
-		[\practice_end]).
 create_ui(Z) :-
 	reply_html_page(
 		title('Huzzah!'),
@@ -152,7 +148,8 @@ prompt_form(_Request, [H]) -->
 	html_begin(input(type(hidden), name(key), value(H))),
 	html_begin(input(type(hidden), name(practice_remaining), value("-1"))),
 	html_begin(input(type(submit), value('Submit'))).
-
+prompt_form(_Request, []) -->
+	practice_end.
 
 %This takes a list and returns it in a string
 get_string([H|T], TailString) :-
@@ -162,7 +159,7 @@ get_string([H|T], TailString) :-
 get_string([H], H).
 
 %Gets a number list from the string
-get_list("-1", []).
+get_list('-1', []).
 get_list(String, List) :-
 	split_string(String, ",", "", AsList),
 	to_number_list(AsList, List).
