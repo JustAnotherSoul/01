@@ -14,16 +14,22 @@ server(Port) :-
 :- http_handler('/memorize.html', begin_memorization, []).
 :- http_handler('/response.html', respond, []). 
 :- http_handler('/update.html', update,[]).
+:- http_handler('/add_entries.html', add_entries,[]).
 
 %Set the title to 'Welcome' and call the predicate "welcome_page" with the request, the welcome page redirects to the memorization page.
 welcome(Request) :-
 	reply_html_page(
 		title('Welcome!'),[\welcome_page(Request)]).
-	
+
+%Add entries to memorize from existing data
+add_entries :-
+	reply_html_page(title('Add Entries'), ['Under construction']).
+
+
 %Puts the keys of entries due for today into 'KeySet'
 get_practice_set(KeySet) :-
 	get_time(CurrentTime),
-	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), 		KeySet).
+	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), KeySet).
 
 %Landing point for 'memorize.html'. Gets the current time, finds all entries that are due and prompts for them. Stores the result in 'entries2.pl' User logins: instead of 'entries2' 'entries_UID/USER_NAME/etc' 
 begin_memorization(_Request) :-
@@ -62,11 +68,19 @@ practice_end -->
 
 welcome_page(_Request) -->
 		html_begin(p),
-		['Hello and welcome! Click '],
+		['Hello and welcome! Choose an option below: '],
+		html_begin(ul),
+		html_begin(li),
 		html_begin(a(href('memorize.html'))),
-		['here'],
+		['Daily Memorization'],
 		html_end(a),
-		[' to be taken to the memorization portion of the site'],
+		html_end(li),
+		html_begin(li),
+		html_begin(a(href('create_entries.html'))),
+		['Add Items'],
+		html_end(a),
+		html_end(li),
+		html_end(ul),
 		html_end(p).
 
 %This will be called once for each entry to be done eventually:
