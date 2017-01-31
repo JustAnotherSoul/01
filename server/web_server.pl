@@ -14,17 +14,35 @@ server(Port) :-
 :- http_handler('/memorize.html', begin_memorization, []).
 :- http_handler('/response.html', respond, []). 
 :- http_handler('/update.html', update,[]).
-:- http_handler('/add_entries.html', add_entries,[]).
+:- http_handler('/create_entries.html', add_entries,[]).
 
 %Set the title to 'Welcome' and call the predicate "welcome_page" with the request, the welcome page redirects to the memorization page.
 welcome(Request) :-
 	reply_html_page(
 		title('Welcome!'),[\welcome_page(Request)]).
 
-%Add entries to memorize from existing data
-add_entries :-
-	reply_html_page(title('Add Entries'), ['Under construction']).
+%Landing point for 'add_entries.html'. Add entries to memorize from existing data
+add_entries(_Request) :-
+	findall(Value, (data(Value,_Hint,_Answer), \+ entry(_Key,Value,_N,_EF,_Date)), DataSet),
+	reply_html_page(title('Add Entries'), [\create_add_entries_form(DataSet)]).
 
+%Creates the table of all the entries in the list
+create_add_entries_form(List) -->
+	html_begin(form(action("update_entries.html"))),
+	html_begin(table(border(1), align(center), width('80%'))),
+	html_begin(tr),
+	table_header("Value"),
+	table_header("Hint"),
+	table_header("Answer"),
+	table_header("Add Entry"),
+	html_end(tr),
+	table_data(List),
+	html_begin(tr),
+	html_begin(td(colspan(4))),
+	html_begin(input(type(submit),value("Submit"))),
+	html_end(td),
+	html_end(tr),
+	html_end(table).
 
 %Puts the keys of entries due for today into 'KeySet'
 get_practice_set(KeySet) :-

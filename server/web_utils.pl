@@ -9,7 +9,7 @@ radio_button(Name,Value) -->
 
 %Creates a table column with the specified value
 table_column(X) -->
-	html-begin(td),
+	html_begin(td),
 	html([
 		\[X]
 	]),
@@ -30,3 +30,20 @@ table_header(X) -->
 		\[X]
 	]),
 	html_end(th).
+table_data([Value|T]) -->
+         {
+ 	 	data(Value, Hint, Answer)
+         },
+         html_begin(tr),
+         table_column(Value),
+         table_column(Hint),
+         table_column(Answer),
+	 html_begin(td),
+	 checkbox("data", Value),
+	 html_end(td),
+         html_end(tr),
+         table_data(T).
+table_data([]) -->
+         [].
+checkbox(Name, Value) -->
+	html_begin(input(type(checkbox), name(Name), value(Value))).
