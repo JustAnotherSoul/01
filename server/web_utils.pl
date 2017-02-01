@@ -32,14 +32,14 @@ table_header(X) -->
 	html_end(th).
 table_data([Value|T]) -->
          {
- 	 	data(Value, Hint, Answer)
+		data(Value, Hint, Answer)
          },
          html_begin(tr),
          table_column(Value),
          table_column(Hint),
          table_column(Answer),
 	 html_begin(td),
-	 checkbox("data", Value),
+	 checkbox("data_key", Value),
 	 html_end(td),
          html_end(tr),
          table_data(T).
@@ -47,3 +47,17 @@ table_data([]) -->
          [].
 checkbox(Name, Value) -->
 	html_begin(input(type(checkbox), name(Name), value(Value))).
+
+
+
+
+
+
+
+
+
+
+
+
+
+

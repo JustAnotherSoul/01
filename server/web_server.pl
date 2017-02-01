@@ -12,16 +12,22 @@ server(Port) :-
 
 :- http_handler(/, welcome, [prefix]).
 :- http_handler('/memorize.html', begin_memorization, []).
-:- http_handler('/response.html', respond, []). 
+:- http_handler('/response.html', respond, []).
 :- http_handler('/update.html', update,[]).
 :- http_handler('/create_entries.html', add_entries,[]).
-
+:- http_handler('/update_entries.html', update_entries,[]).
 %Set the title to 'Welcome' and call the predicate "welcome_page" with the request, the welcome page redirects to the memorization page.
 welcome(Request) :-
 	reply_html_page(
 		title('Welcome!'),[\welcome_page(Request)]).
 
-%Landing point for 'add_entries.html'. Add entries to memorize from existing data
+%Landing point for update_entries.html.
+update_entries(Request) :-
+    http_parameters(Request, [data_key(Data,[ list(string) ])]) , reply_html_page(title('Creating Entries'),[\create_add_entries_form(Data)]).
+
+% Landing point for 'add_entries.html'. Select entries to memorize from
+% existing data. Going to add a 'categories' one day for breaking the
+% data up.
 add_entries(_Request) :-
 	findall(Value, (data(Value,_Hint,_Answer), \+ entry(_Key,Value,_N,_EF,_Date)), DataSet),
 	reply_html_page(title('Add Entries'), [\create_add_entries_form(DataSet)]).
@@ -49,24 +55,24 @@ get_practice_set(KeySet) :-
 	get_time(CurrentTime),
 	findall(Key, (entry(Key,_Value,_N,_EF,Date), CurrentTime > Date), KeySet).
 
-%Landing point for 'memorize.html'. Gets the current time, finds all entries that are due and prompts for them. Stores the result in 'entries2.pl' User logins: instead of 'entries2' 'entries_UID/USER_NAME/etc' 
+%Landing point for 'memorize.html'. Gets the current time, finds all entries that are due and prompts for them. Stores the result in 'entries2.pl' User logins: instead of 'entries2' 'entries_UID/USER_NAME/etc'
 begin_memorization(_Request) :-
-        get_practice_set(Z),	
+        get_practice_set(Z),
 	create_ui(Z).
 
 %Landing point for 'update.html'. Updates the entry based on the users response. First pulls out the headers, then it converts the remaining practice back to a list of numbers (likewise the key), and calls the 'process' method.
-update(Request) :- 
+update(Request) :-
 	http_parameters(Request, [key(Key,[]), rating(Rating,[]), practice_remaining(Practice,[])]),
 	atom_number(Key, H),
 	atom_number(Rating, Q),
 	get_list(Practice, RemainingList),
 	process(H,Q,RemainingList, NewPractice),
-       	store('entries2.pl'),
-	create_ui(NewPractice).	
-	
+	store('entries2.pl'),
+	create_ui(NewPractice).
+
 %Landing point for 'response.html'
 respond(Request) :-
-	http_parameters(Request, [key(Key,[]),answer(Answer,[]),practice_remaining(Practice,[])]), 
+	http_parameters(Request, [key(Key,[]),answer(Answer,[]),practice_remaining(Practice,[])]),
 	reply_html_page(
 		title('Rate your response'),
 		[\response_form(_Request, Key, Practice, Answer)]).
@@ -117,7 +123,7 @@ prompt_form(_Request, [H|T]) -->
 	html_begin(input(type(hidden), name(key), value(H))),
 	html_begin(input(type(hidden), name(practice_remaining), value(TailString))),
 	html_begin(input(type(submit), value('Submit'))).
-prompt_form(_Request, [H]) --> 
+prompt_form(_Request, [H]) -->
 	{
 		entry(H, Value, _N, _EF, _Date),
 		data(Value, Hint, _Answer)
@@ -146,7 +152,7 @@ get_list(String, List) :-
 
 %Converts a list of strings to a list of numbers
 to_number_list([H|T], NumberList) :-
-	atom_string(Atom, H), 
+	atom_string(Atom, H),
 	atom_number(Atom, Num),
 	to_number_list(T, NumberList2),
 	append([Num],NumberList2, NumberList).
@@ -170,4 +176,4 @@ response_form(_Request, Key, KeyList, Answer) -->
 	html_begin(input(type(hidden), name(key), value(Key))),
 	html_begin(input(type(hidden), name(practice_remaining), value(KeyList))),
 	html_begin(input(type(submit), value('Submit'))).
-	
+
