@@ -23,7 +23,13 @@ welcome(Request) :-
 
 %Landing point for update_entries.html.
 update_entries(Request) :-
-    http_parameters(Request, [data_key(Data,[ list(string) ])]) , reply_html_page(title('Creating Entries'),[\create_add_entries_form(Data)]).
+    %data_key: The name of the parameter in the request (from the 'table_data' predicate, in web_utils.pl
+    http_parameters(Request, [data_key(Data,[ list(string) ])]), create_entry(Data), welcome(Request).
+
+create_entry([]).
+create_entry([Value|T]):-
+    findall(Key, entry(Key,_Value,_N,_EF,_Date), Entries), length(Entries,Size),
+    assertz(entry(Size, Value, 0, 2.5, 0)), create_entry(T).
 
 % Landing point for 'add_entries.html'. Select entries to memorize from
 % existing data. Going to add a 'categories' one day for breaking the
@@ -176,4 +182,38 @@ response_form(_Request, Key, KeyList, Answer) -->
 	html_begin(input(type(hidden), name(key), value(Key))),
 	html_begin(input(type(hidden), name(practice_remaining), value(KeyList))),
 	html_begin(input(type(submit), value('Submit'))).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
