@@ -73,7 +73,7 @@ update(Request) :-
 	atom_number(Rating, Q),
 	get_list(Practice, RemainingList),
 	process(H,Q,RemainingList, NewPractice),
-	store('entries2.pl'),
+	store('entries.pl'),
 	create_ui(NewPractice).
 
 %Landing point for 'response.html'
