@@ -10,12 +10,27 @@
 server(Port) :-
   http_server(http_dispatch, [port(Port)]).
 
-:- http_handler(/,welcome, [prefix]).
-:- http_handler('/get_dummy_string', getdummystring, []).
 
+%Redirect everything to welcome that's not valid.
+:- http_handler(/,welcome, [prefix]).
+%Return something. Referenced from javascript in hello.html
+:- http_handler('/get_dummy_string', getdummystring, []).
+%The loverly stylesheet we're serving.
+:- http_handler('/style.css',get_styles,[]).
+
+%Serve an html file
 welcome(Request) :-
   http_reply_file('hello.html', [],Request).
 
+%This is because we said 'Hey, redirect everything to welcome that's not valid
+%So we have to serve style.css explicitly
+get_styles(Request) :-
+  http_reply_file('style.css',[],Request).
+
+%The 'out' stream is pointing at the correct place already
+% Per:http://www.pathwayslms.com/swipltuts/html/ CH2.2
 getdummystring(_Request) :-
+  %Format outputs with some stuff.
+  %Might be able to return Content-type text/javascript for json?
   format('Content-type: text/plain~n~n'),
   format('Hello again!~n').
