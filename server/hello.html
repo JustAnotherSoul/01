@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+
+  <TITLE>
+  Hello World!
+</TITLE>
+</HEAD>
+<BODY>
+  <DIV>
+    Hello world!
+  </DIV>
+  <HR/>
+  <DIV id="target"></DIV>
+</BODY>
+<SCRIPT type="text/javascript">
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET","get_dummy_string",true);
+  xmlHttp.onreadystatechange = function() {
+    document.getElementById("target").innerHTML = xmlHttp.responseText;
+  };
+  xmlHttp.send(null);
+</SCRIPT>
+</HTML>
