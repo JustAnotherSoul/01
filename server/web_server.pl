@@ -182,38 +182,3 @@ response_form(_Request, Key, KeyList, Answer) -->
 	html_begin(input(type(hidden), name(key), value(Key))),
 	html_begin(input(type(hidden), name(practice_remaining), value(KeyList))),
 	html_begin(input(type(submit), value('Submit'))).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

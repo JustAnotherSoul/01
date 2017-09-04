@@ -4,3 +4,4 @@ data("Psalm1_3", "Psalm 1:3", "And he shall be like a tree which is planted near
 data("Psalm1_4", "Psalm 1:4", "Not so the wicked, not so: but like the dust which the wind driveth from the face of the earth.").
 data("Psalm1_5", "Psalm 1:5", "Therefore the wicked shall not rise again in judgement: nor sinners in the council of the just.").
 data("Psalm1_6", "Psalm 1:6", "For the Lord knoweth the way of the just: and the way of the wicked shall perish.").
+data("Psalm2_1", "Psalm 2:1", "Why have the gentiles raged and the people devised vain things?").
