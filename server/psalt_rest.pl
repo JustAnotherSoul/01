@@ -41,4 +41,4 @@ get_dummy_string(_Request) :-
   %Format outputs with some stuff.
   %Might be able to return Content-type text/javascript for json?
   format('Content-type: text/plain~n~n'),
-  format('Hello again!~n').
+  format('{ "name":"Dave", "status":"I cannot do that" }').
