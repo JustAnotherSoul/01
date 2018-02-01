@@ -2,6 +2,9 @@
 % webapplication. Instead of displaying the HTML from Prolog itself
 % (because JSP and JSP-alikes are horrific). It's cool to be able 
 %to generate webpages, but ultimately maintaining it is horrible.
+:- ensure_loaded("../algorithm/memorization").
+:- ensure_loaded("../data/entries").
+:- ensure_loaded("../data/data").
 
 :- use_module(library(http/http_dispatch)).
 :- use_module(library(http/thread_httpd)).
@@ -42,3 +45,4 @@ get_dummy_string(_Request) :-
   %Might be able to return Content-type text/javascript for json?
   format('Content-type: text/plain~n~n'),
   format('{ "name":"Dave", "status":"I cannot do that" }').
+
