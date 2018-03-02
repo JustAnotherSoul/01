@@ -47,10 +47,21 @@ submitAssessment = function() {
   };
   xmlHttp.send("null");
 }
+getDailyPrctice = function() {
+    var xmlHttp = new XMLHttpRequest();
+    var text;
+    xmlHttp.open("GET", "get_dummy_string", true);
+    xmlHttp.onreadystatechange = function() {
+      text = xmlHttp.responseText;
+      document.getElementById("output").innerHTML = xmlHttp.responseText;
+      var obj = JSON.parse(text);	
+	document.getElementById("new_item").innerHTML = "Hello " + obj.name + " " + obj.status + "\n";
+    }
+}
 window.onload=function() {
     document.getElementById("target").addEventListener("click", getDummyText);
     document.getElementById("new_item_submit").addEventListener("click", addItem);
     document.getElementById("submit_guess").addEventListener("click", submitGuess);
     document.getElementById("submit_self_assessment").addEventListener("click", submitAssessment);
-	
+    getDailyPractice;	
 }
